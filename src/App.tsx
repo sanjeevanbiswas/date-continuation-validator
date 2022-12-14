@@ -114,7 +114,7 @@ const App: React.FC = () => {
   return (
     <Layout style={{ height: "calc(100vh - 26px)" }}>
       <Header className="header">
-        <Image width={110} src="date-continuation-validator/logo.png" preview={false} />
+        <Image width={110} src="logo.png" preview={false} />
         <div style={{ flexGrow: 2 }}></div>
       </Header>
 
