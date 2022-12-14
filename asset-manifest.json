@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.e529a532.css",
-    "main.js": "/static/js/main.008e8cf4.js",
-    "static/js/787.1947437a.chunk.js": "/static/js/787.1947437a.chunk.js",
-    "index.html": "/index.html",
-    "main.e529a532.css.map": "/static/css/main.e529a532.css.map",
-    "main.008e8cf4.js.map": "/static/js/main.008e8cf4.js.map",
-    "787.1947437a.chunk.js.map": "/static/js/787.1947437a.chunk.js.map"
+    "main.css": "/date-continuation-validator/static/css/main.e529a532.css",
+    "main.js": "/date-continuation-validator/static/js/main.a97bc250.js",
+    "static/js/787.1947437a.chunk.js": "/date-continuation-validator/static/js/787.1947437a.chunk.js",
+    "index.html": "/date-continuation-validator/index.html",
+    "main.e529a532.css.map": "/date-continuation-validator/static/css/main.e529a532.css.map",
+    "main.a97bc250.js.map": "/date-continuation-validator/static/js/main.a97bc250.js.map",
+    "787.1947437a.chunk.js.map": "/date-continuation-validator/static/js/787.1947437a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e529a532.css",
-    "static/js/main.008e8cf4.js"
+    "static/js/main.a97bc250.js"
   ]
 }
