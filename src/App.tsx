@@ -109,9 +109,9 @@ const App: React.FC = () => {
   return (
     <Layout style={{ height: "calc(100vh - 26px)" }}>
       <Header className="header">
-          <Image width={70} src="logo-brb.png" preview={false} />
+          <Image width={70} src="date-continuation-validator/logo-brb.png" preview={false} />
           <div style={{ flexGrow: 2 }}></div>
-          <Image width={150} src="logo-lbv.jpeg" preview={false} />
+          <Image width={150} src="date-continuation-validator/logo-lbv.jpeg" preview={false} />
       </Header>
 
       <Layout style={{ padding: '24px 0', background: colorBgContainer, height: "100%" }}>
