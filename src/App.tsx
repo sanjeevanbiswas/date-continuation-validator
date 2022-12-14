@@ -15,16 +15,22 @@ const DATE_FORMATS = [
   "YYYY/M/DD", "YYYY/MM/D", "YYYY/M/D"
 ];
 
-const THRESHOLD_DAYS = 10;
+const THRESHOLD_DAYS = 28;
 
 export interface IDate {
   order: number;
-  start: string;
-  end: string;
+  start: any;
+  end: any;
 }
 
-const getDuration = (date1: string, date2: string): any =>
-  moment(date1, 'dd-MM-yyyy').diff(moment(date2, 'dd-MM-yyyy'), 'days');
+const getDuration = (date1: any, date2: any): any => {
+
+  let dateA = moment(date1),
+    dateB = moment(date2);
+
+  let a = dateA.diff(dateB, 'days');
+  return a;
+};
 
 const App: React.FC = () => {
   const {
@@ -42,14 +48,14 @@ const App: React.FC = () => {
       title: 'Start Date',
       key: 'startDate',
       render: (_: string, field: IDate) => (
-        <Text>{field.start}</Text>
+        <Text>{formatDate(field.start)}</Text>
       ),
     },
     {
       title: 'End Date',
       key: 'endDate',
       render: (_: string, field: IDate) => (
-        <Text>{field.end}</Text>
+        <Text>{formatDate(field.end)}</Text>
       ),
     },
     {
@@ -63,10 +69,11 @@ const App: React.FC = () => {
       title: 'Gap',
       key: 'Gap',
       render: (_: string, field: IDate, index: number) => {
-      let gapsInDays = index > 0 ? getDuration(field.start, dateList[index - 1].end) : '';
-      return (
-        gapsInDays ? <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{gapsInDays}</Tag> : null
-      )},
+        let gapsInDays = index > 0 ? getDuration(field.start, dateList[index - 1].end) : '';
+        return (
+          gapsInDays ? <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{gapsInDays}</Tag> : null
+        )
+      },
     },
     {
       title: '',
@@ -75,6 +82,7 @@ const App: React.FC = () => {
       render: (_: string, field: IDate, index: number) => (
         <Button
           type="text"
+          key={`deleteBtn-${index}`}
           danger
           icon={<DeleteOutlined />}
           onClick={() => {
@@ -89,15 +97,13 @@ const App: React.FC = () => {
     },
   ];
 
+  const formatDate = (date: any) : string => moment(date).format('DD-MM-YYYY');
 
   const onFinish = () => {
-    let start = moment(startDate, DATE_FORMATS, true).format('DD-MM-YYYY');
-    let end = moment(endDate, DATE_FORMATS, true).format('DD-MM-YYYY');
-
     if (startDate && endDate) {
       setDateList((state: IDate[]) => {
         let values = [...state];
-        values.push({ start, end, order: state.length });
+        values.push({ start: startDate, end: endDate, order: state.length });
         return values;
       });
 
@@ -109,9 +115,8 @@ const App: React.FC = () => {
   return (
     <Layout style={{ height: "calc(100vh - 26px)" }}>
       <Header className="header">
-          <Image width={70} src="date-continuation-validator/logo-brb.png" preview={false} />
-          <div style={{ flexGrow: 2 }}></div>
-          <Image width={150} src="date-continuation-validator/logo-lbv.jpeg" preview={false} />
+        <Image width={110} src="date-continuation-validator/logo.png" preview={false} />
+        <div style={{ flexGrow: 2 }}></div>
       </Header>
 
       <Layout style={{ padding: '24px 0', background: colorBgContainer, height: "100%" }}>
@@ -162,31 +167,32 @@ const App: React.FC = () => {
                     dateList.map((field: IDate, index: number) => {
                       let gapsInDays = index > 0 ? getDuration(field.start, dateList[index - 1].end) : '';
                       return ([
-                      index > 0 ? (
-                        <Timeline.Item dot={<AimOutlined />}>
+                        index > 0 ? (
+                          <Timeline.Item dot={<AimOutlined />}>
+                            <Space>
+                              <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{`${gapsInDays} days`}</Tag>
+                            </Space>
+                          </Timeline.Item>
+                        ) : null,
+                        <Timeline.Item dot={<CalendarOutlined style={{ fontSize: '16px' }} />}>
                           <Space>
-                            <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{`${gapsInDays} days`}</Tag>
+                            <Text strong>Start Date: </Text>
+                            <Text>{formatDate(field.start)}</Text>
+                          </Space>
+                        </Timeline.Item>,
+                        <Timeline.Item>
+                          <Space>
+                            <Text>{getDuration(field.end, field.start)} days</Text>
+                          </Space>
+                        </Timeline.Item>,
+                        <Timeline.Item dot={<CalendarOutlined style={{ fontSize: '16px' }} />}>
+                          <Space>
+                            <Text strong>End Date: </Text>
+                            <Text>{formatDate(field.end)}</Text>
                           </Space>
                         </Timeline.Item>
-                      ) : null,
-                      <Timeline.Item dot={<CalendarOutlined style={{ fontSize: '16px' }} />}>
-                        <Space>
-                          <Text strong>Start Date: </Text>
-                          <Text>{field.start}</Text>
-                        </Space>
-                      </Timeline.Item>,
-                      <Timeline.Item>
-                        <Space>
-                          <Text>{getDuration(field.end, field.start)} days</Text>
-                        </Space>
-                      </Timeline.Item>,
-                      <Timeline.Item dot={<CalendarOutlined style={{ fontSize: '16px' }} />}>
-                        <Space>
-                          <Text strong>End Date: </Text>
-                          <Text>{field.end}</Text>
-                        </Space>
-                      </Timeline.Item>
-                    ])})
+                      ])
+                    })
                   }
                 </Timeline>
               )}
