@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import moment from 'moment';
 import DatePicker from 'react-date-picker';
-import { Layout, theme, Button, Space, Typography, Timeline, Table, Empty, Image } from 'antd';
+import { Layout, theme, Button, Space, Typography, Timeline, Table, Empty, Image, Tag } from 'antd';
 import { AimOutlined, CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
 import './App.css';
 import 'react-date-picker/dist/DatePicker.css';
@@ -14,6 +14,8 @@ const DATE_FORMATS = [
   "M/D/YYYY", "MM/DD/YY", "M/DD/YY", "MM/D/YY", "M/D/YY", "YYYY/MM/DD",
   "YYYY/M/DD", "YYYY/MM/D", "YYYY/M/D"
 ];
+
+const THRESHOLD_DAYS = 10;
 
 export interface IDate {
   order: number;
@@ -60,9 +62,11 @@ const App: React.FC = () => {
     {
       title: 'Gap',
       key: 'Gap',
-      render: (_: string, field: IDate, index: number) => (
-        index > 0 ? <Text>{getDuration(field.start, dateList[index - 1].end)}</Text> : null
-      ),
+      render: (_: string, field: IDate, index: number) => {
+      let gapsInDays = index > 0 ? getDuration(field.start, dateList[index - 1].end) : '';
+      return (
+        gapsInDays ? <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{gapsInDays}</Tag> : null
+      )},
     },
     {
       title: '',
@@ -155,11 +159,13 @@ const App: React.FC = () => {
               ) : (
                 <Timeline>
                   {
-                    dateList.map((field: IDate, index: number) => ([
+                    dateList.map((field: IDate, index: number) => {
+                      let gapsInDays = index > 0 ? getDuration(field.start, dateList[index - 1].end) : '';
+                      return ([
                       index > 0 ? (
                         <Timeline.Item dot={<AimOutlined />}>
                           <Space>
-                            <Text>{getDuration(field.start, dateList[index - 1].end)} days</Text>
+                            <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{`${gapsInDays} days`}</Tag>
                           </Space>
                         </Timeline.Item>
                       ) : null,
@@ -180,7 +186,7 @@ const App: React.FC = () => {
                           <Text>{field.end}</Text>
                         </Space>
                       </Timeline.Item>
-                    ]))
+                    ])})
                   }
                 </Timeline>
               )}
