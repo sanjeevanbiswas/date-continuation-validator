@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
 import moment from 'moment';
 import DatePicker from 'react-date-picker';
-import { Layout, theme, Button, Space, Typography, Timeline, Table, Empty, Image, Tag } from 'antd';
-import { AimOutlined, CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Layout, theme, Button, Space, Typography, Timeline, Table, Empty, Image, Tag, Modal, Input } from 'antd';
+import { AimOutlined, CalendarOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
 import './App.css';
 import 'react-date-picker/dist/DatePicker.css';
 
 const { Header, Content, Sider } = Layout;
 const { Text } = Typography;
-const DATE_FORMATS = [
-  "MM-DD-YYYY", "M-DD-YYYY", "MM-D-YYYY", "M-D-YYYY", "MM-DD-YY", "M-DD-YY", "MM-D-YY", "M-D-YY",
-  "YYYY-MM-DD", "YYYY-M-DD", "YYYY-MM-D", "YYYY-M-D", "MM/DD/YYYY", "M/DD/YYYY", "MM/D/YYYY",
-  "M/D/YYYY", "MM/DD/YY", "M/DD/YY", "MM/D/YY", "M/D/YY", "YYYY/MM/DD",
-  "YYYY/M/DD", "YYYY/MM/D", "YYYY/M/D"
-];
 
-const THRESHOLD_DAYS = 28;
+const DEFAULT_THRESHOLD_DAYS = '28';
+const THRESHOLD_DAYS_KEY = "THRESHOLD_DAYS";
 
 export interface IDate {
   order: number;
@@ -39,6 +34,10 @@ const App: React.FC = () => {
 
   const [dateList, setDateList] = useState<IDate[]>([]);
   //const [monthSelector, setMonthSelector] = useState<boolean>(false);
+  const [isThresholdModalOpen, setIsThresholdModalOpen] = useState<boolean>(false);
+  const [thresholdDays, setThresholdDays] = useState<number>(
+    parseInt(localStorage.getItem(THRESHOLD_DAYS_KEY) ?? DEFAULT_THRESHOLD_DAYS)
+  );
 
   const [startDate, setStartDate] = useState<any>();
   const [endDate, setEndDate] = useState<any>();
@@ -59,19 +58,19 @@ const App: React.FC = () => {
       ),
     },
     {
-      title: 'Duration',
+      title: 'Duration (Days)',
       key: 'duration',
       render: (_: string, field: IDate, index: number) => (
         <Text>{getDuration(field.end, field.start)}</Text>
       ),
     },
     {
-      title: 'Gap',
+      title: 'Gap (Days)',
       key: 'Gap',
       render: (_: string, field: IDate, index: number) => {
         let gapsInDays = index > 0 ? getDuration(field.start, dateList[index - 1].end) : '';
         return (
-          gapsInDays ? <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{gapsInDays}</Tag> : null
+          gapsInDays ? <Tag color={gapsInDays <= thresholdDays ? "success" : "error"}>{gapsInDays}</Tag> : null
         )
       },
     },
@@ -97,7 +96,7 @@ const App: React.FC = () => {
     },
   ];
 
-  const formatDate = (date: any) : string => moment(date).format('DD-MM-YYYY');
+  const formatDate = (date: any): string => moment(date).format('DD-MM-YYYY');
 
   const onFinish = () => {
     if (startDate && endDate) {
@@ -121,7 +120,7 @@ const App: React.FC = () => {
 
       <Layout style={{ padding: '24px 0', background: colorBgContainer, height: "100%" }}>
         <Content style={{ padding: '0 24px' }}>
-          <Space size={48}>
+          <Space size={48} style={{ width: "100%" }}>
             <Space size="large">
               <Text strong>Start Date:</Text>
               <DatePicker
@@ -152,9 +151,21 @@ const App: React.FC = () => {
                 required />
             </Space>
 
-            <Button type="primary" htmlType="submit" onClick={onFinish}>
-              Add Dates
-            </Button>
+            <Space className="action-btns-section">
+              <Button type="primary" htmlType="submit" onClick={onFinish}>
+                Add Dates
+              </Button>
+
+              <div style={{ flexGrow: 2 }}></div>
+              <Button
+                style={{}}
+                type="text"
+                icon={<SettingOutlined />}
+                onClick={() => {
+                  setIsThresholdModalOpen(true);
+                }}
+              />
+            </Space>
           </Space>
 
           <Layout hasSider className="reportLayout">
@@ -170,7 +181,9 @@ const App: React.FC = () => {
                         index > 0 ? (
                           <Timeline.Item dot={<AimOutlined />}>
                             <Space>
-                              <Tag color={gapsInDays <= THRESHOLD_DAYS ? "success" : "error"}>{`${gapsInDays} days`}</Tag>
+                              <Tag color={gapsInDays <= thresholdDays ? "success" : "error"}>
+                                <Text strong style={{ color: "inherit", fontSize: "16px" }}>{`${gapsInDays} days`}</Text>
+                              </Tag>
                             </Space>
                           </Timeline.Item>
                         ) : null,
@@ -205,6 +218,24 @@ const App: React.FC = () => {
             </Content>
           </Layout>
         </Content>
+        <Modal
+          title="Set maximum allowed gap between dates"
+          open={isThresholdModalOpen}
+          footer={null}
+          closable
+          onCancel={() => setIsThresholdModalOpen(false)}>
+          <Input
+            suffix="Days"
+            value={thresholdDays}
+            onChange={(e: any) => {
+              let val = e.target.value;
+              setThresholdDays(parseInt(val ? val : 0));
+              localStorage.setItem("THRESHOLD_DAYS_KEY", val);
+            }}
+            placeholder="Input a number"
+            maxLength={16}
+          />
+        </Modal>
       </Layout>
     </Layout>
   );
